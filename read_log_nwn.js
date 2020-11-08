@@ -22,7 +22,6 @@ document.addEventListener("DOMContentLoaded", function () {
 
    })
 
-   test()
 
 })
 
@@ -410,15 +409,4 @@ const setOptions = () => {
 
    }
 
-}
-
-
-const test = (fromNumber) => {
-   console.log(fromNumber);
-
-   let nextNumber = fromNumber - 1;
-
-   if (nextNumber > 0) {
-      return nextNumber
-   }
 }
