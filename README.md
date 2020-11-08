@@ -12,4 +12,4 @@ Mise en forme des logs nwn2 générés par le ClientExtension
 __*** ATTENTION ***__  
 __Ne fonctionne qu'avec les logs générés par le ClientExtension__  
 
-(sous GNUv2)
+(sous licence GNUv2)
