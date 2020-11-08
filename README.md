@@ -10,4 +10,4 @@ Mise en forme des logs nwn2 générés par le ClientExtension
   
   
 __*** ATTENTION ***__  
-__Ne fonctionne qu'ave les logs générés par les ClientExtension__  
+__Ne fonctionne qu'avec les logs générés par le ClientExtension__  
