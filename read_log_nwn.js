@@ -337,7 +337,7 @@ const lineColorByName = (unLog) => {
             tblPjName.names.push(thePjName)
             // tblPjName.colors.push(`hsl(${num * 150},55%,40%)`)
             // tblPjName.colors.push(`hsl(${getRandomInt(320) * (num + 1)},52%,35%)`)
-            tblPjName.colors.push(getRandomInt(180) * (num + 1))
+            tblPjName.colors.push(getRandomInt(320) * (num + 1))
          }
       }
    }
