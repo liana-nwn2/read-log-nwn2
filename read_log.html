@@ -9,28 +9,43 @@
 
 <body>
 
-
 <div class="container">
    <div class="col_files">
       <div class="openFolder">
+         <div class="back_to_liste">
+            <span>Revenir à la liste des fichiers</span>
+         </div>
          <label for="folderPicker">
             <span class="label_caption"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="17" viewBox="0 0 20 17"><path d="M10 0l-5.2 4.9h3.3v5.1h3.8v-5.1h3.3l-5.2-4.9zm9.3 11.5l-3.2-2.1h-2l3.4 2.6h-3.5c-.1 0-.2.1-.2.1l-.8 2.3h-6l-.8-2.2c-.1-.1-.1-.2-.2-.2h-3.6l3.4-2.6h-2l-3.2 2.1c-.4.3-.7 1-.6 1.5l.6 3.1c.1.5.7.9 1.2.9h16.3c.6 0 1.1-.4 1.3-.9l.6-3.1c.1-.5-.2-1.2-.7-1.5z"></path></svg> Ouvrir un dossier log</span>
             <span class="label_note">(Docs &#8250; NevewinterNights2 &#8250; log &#8250; pj)</span>
          </label>
-         <input type="file" id="folderPicker" name="fileList" webkitdirectory directory accept=".log"/>
+         <input type="file" id="folderPicker" name="fileList" webkitdirectory directory accept="/^(.*)([_]|[ (])(Chatlog)$" pattern="/^(.*)([_]|[ (])(Chatlog)$"/>
       </div>
       <span class="input_group">
                <input id="fileSort" type="checkbox">
                <label for="fileSort">Trier du plus récent au plus ancien</label>
             </span>
-      <ul id="listing"></ul>
+      <div class="listing_container">
+         <ul id="listing"></ul>
+      </div>
+
    </div>
    <div class="col_table">
       <ul class="menu_options">
          <li class="collapse">
             &lsaquo;
          </li>
-         <li class="navig">
+         <li class="open_search disabled">
+            <span><svg version="1.1" id="Calque_4" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px"
+	 width="400px" height="400px" viewBox="0 0 400 400" style="enable-background:new 0 0 400 400;" xml:space="preserve">
+<path fill="#ffffff" d="M372.1,344.4l-66.9-66.9c-0.3-0.3-0.6-0.5-0.9-0.8c21.2-27.2,33.9-61.3,33.9-98.5c0-88.4-71.6-160-160-160
+	s-160,71.6-160,160s71.6,160,160,160c36.2,0,69.6-12,96.4-32.3c0.3,0.4,0.7,0.8,1,1.1l66.9,66.9c4.1,4.1,9.4,6.1,14.8,6.1
+	c5.3,0,10.7-2,14.8-6.1C380.2,365.8,380.2,352.6,372.1,344.4z M178.2,296.5c-65.2,0-118.2-53-118.2-118.2S113,60,178.2,60
+	s118.2,53,118.2,118.2S243.4,296.5,178.2,296.5z"/>
+</svg>
+</span>
+         </li>
+         <li class="navig disabled">
             <span class="file_name"></span>
             <span class="file_prev disabled"></span>
             <span class="file_next"></span>
@@ -48,23 +63,93 @@
          </li>
          <li class="info">
             <span>
-            <svg version="1.1" id="Capa_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px" viewBox="0 0 192.146 192.146"  xml:space="preserve">
-               <path style="fill:#e35049;" d="M108.186,144.372c0,7.054-4.729,12.32-12.037,12.32h-0.254c-7.054,0-11.92-5.266-11.92-12.32     c0-7.298,5.012-12.31,12.174-12.31C103.311,132.062,108.059,137.054,108.186,144.372z M88.44,125.301h15.447l2.951-61.298H85.46     L88.44,125.301z M190.372,177.034c-2.237,3.664-6.214,5.921-10.493,5.921H12.282c-4.426,0-8.51-2.384-10.698-6.233     c-2.159-3.849-2.11-8.549,0.147-12.349l84.111-149.22c2.208-3.722,6.204-5.96,10.522-5.96h0.332     c4.445,0.107,8.441,2.618,10.513,6.546l83.515,149.229C192.717,168.768,192.629,173.331,190.372,177.034z M179.879,170.634     L96.354,21.454L12.292,170.634H179.879z"/>
+            <svg version="1.1" id="Capa_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px" viewBox="0 0 192.146 192.146" xml:space="preserve">
+               <path style="fill:#e35049;"
+                     d="M108.186,144.372c0,7.054-4.729,12.32-12.037,12.32h-0.254c-7.054,0-11.92-5.266-11.92-12.32     c0-7.298,5.012-12.31,12.174-12.31C103.311,132.062,108.059,137.054,108.186,144.372z M88.44,125.301h15.447l2.951-61.298H85.46     L88.44,125.301z M190.372,177.034c-2.237,3.664-6.214,5.921-10.493,5.921H12.282c-4.426,0-8.51-2.384-10.698-6.233     c-2.159-3.849-2.11-8.549,0.147-12.349l84.111-149.22c2.208-3.722,6.204-5.96,10.522-5.96h0.332     c4.445,0.107,8.441,2.618,10.513,6.546l83.515,149.229C192.717,168.768,192.629,173.331,190.372,177.034z M179.879,170.634     L96.354,21.454L12.292,170.634H179.879z"/>
             </svg>
-               Ne fonctionne qu'avec les logs générés par le <u>Client extension</u></span>
+               Ne fonctionne qu'avec les logs générés par le <u>Client Extension</u></span>
          </li>
       </ul>
       <div id="popupFullName"></div>
-      <table id="fileContent">
-         <tbody>
-         <tr>
-            <td class="pjName btn"></td>
-         </tr>
+      <div class="table_container">
+         <section id="searchFiles" class="" >
+            <div class="search_fail">
+               <span>La recherche n'a donnée aucun résultat</span>
+            </div>
+            <span class="close_btn">X</span>
+            <h2>Rechercher parmi les fichiers</h2>
+            <div class="searchOptions">
+               <div class="inputOptions chooseDate disabled">
+                  <label for="checkByDate">
+                     <input id="checkByDate" type="checkbox">
+                     <span>Date : </span>
+                  </label>
+                  <label for="dateDeb">
+                     <span>du</span>
+                     <input id="dateDeb" type="date">
+                  </label>
+                  <label for="dateFin">
+                     <span>au</span>
+                     <input id="dateFin" type="date">
+                  </label>
+               </div>
+            </div>
+            <div class="searchOptions">
+               <div class="inputOptions">
+                  <input id="checkMsgExcludeParty" type="checkbox">
+                  <label for="checkMsgExcludeParty">Exclure les messages de groupe [party]</label>
+               </div>
+               <div class="inputOptions">
+                  <input id="checkMsgExcludeShout" type="checkbox">
+                  <label for="checkMsgExcludeShout">Exclure les crier [shout]</label>
+               </div>
+               <div class="inputOptions">
+                  <input id="checkMsgExcludeMp" type="checkbox">
+                  <label for="checkMsgExcludeMp">Exclure les messages privés [tell]</label>
+               </div>
+            </div>
+            <div class="searchOptions">
+               <div class="inputOptions">
+                  <input id="checkWholeWord" type="checkbox" checked>
+                  <label for="checkWholeWord">Mot entier uniquement.</label>
+               </div>
+               <div class="inputOptions">
+                  <input id="checkCaseSensitive" type="checkbox" checked>
+                  <label for="checkCaseSensitive">Sensible à la casse.</label>
+               </div>
+            </div>
+            <div class="searchContainer">
+               <label for="termToSearch"></label>
+               <input id="termToSearch" type="search" placeholder="Mot ou phrase à rechercher (3 caractères minimum)" results="5">
+               <button id="goSearch">Lancer la recherche</button>
+               <button id="goNewSearch" class="disabled">Nouvelle recherche</button>
+            </div>
+            <div id="progress">
+               <div id="bar"></div>
+            </div>
 
-         </tbody>
-      </table>
+         </section>
+         <div class="search_result">
+            <table id="resultByLine">
+               <tbody></tbody>
+            </table>
+         </div>
+         <div class="handle"></div>
+         <div class="file_content">
+            <div class="warning_info">
+               <span> Le dossier sélectionné est incorrect</span>
+            </div>
+            <table id="fileContent">
+               <tbody></tbody>
+            </table>
+         </div>
+
+      </div>
    </div>
 </div>
+
+<input id="arrayRefSearch" type="hidden">
+<input id="fileListeRef" type="hidden">
 
 
 <script src="read_log_nwn.js"></script>
