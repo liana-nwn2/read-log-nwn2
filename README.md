@@ -7,6 +7,10 @@ Mise en forme des logs nwn2 générés par le ClientExtension
 3/ Sélectionner un dossier __log/pj__ via le bouton bleu en haut à gauche et valider  
 (sous windows ils sont dans le dossier __[Documents › NevewinterNights2 › log › pj]__)  
   
+
+19/11/2020
+- Correction de bugs.
+- Ajout d'une fonctionnalité de recherche.
   
   
 __*** ATTENTION ***__  
