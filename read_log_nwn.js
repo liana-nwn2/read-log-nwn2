@@ -451,8 +451,6 @@ const tableResultListeners = () => {
       const fileContent = document.getElementById('fileContent')
       let thisLine = e.target
 
-      console.log('CLICK')
-
       if (thisLine.className !== 'index') {
          thisLine = thisLine.closest('tr').querySelector('td.index')
       }
@@ -469,10 +467,7 @@ const tableResultListeners = () => {
 
    const resultByLineTable = document.querySelectorAll('#resultByLine tr')
 
-   //if (resultByLineTable) {
-   console.log(resultByLineTable)
-      resultByLineTable.forEach(lineResult => lineResult.onclick = clickedLine)
-   //}
+   resultByLineTable.forEach(lineResult => lineResult.onclick = clickedLine)
 
 
    // AJOUTE UN ROLLOVER SUR LES CELLUlES PjName POUR LES NOMS LONGS
@@ -570,8 +565,6 @@ const openFiles = (listeFiles, search, searchOptions) => {
             }
 
             if (fileindex === listeFiles.length) {
-
-               console.log(thisFile)
 
                if (searchResult.length > 0) {
 
