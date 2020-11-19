@@ -680,7 +680,7 @@ td.pjName.btn:hover::after {
   box-shadow: 0 0 6px rgba(106, 117, 159, 0.6);
   background-color: #fff;
   left: calc(50% - 385px);
-  top: -24%;
+  top: -300;
   padding: 25px 30px 30px 30px;
   display: flex;
   flex-direction: row;
@@ -911,7 +911,7 @@ td.pjName.btn:hover::after {
 
 @keyframes fromTop {
   0% {
-    top: -24%;
+    top: -300px;
     opacity: 0;
   }
   100% {
@@ -925,7 +925,7 @@ td.pjName.btn:hover::after {
     opacity: 1;
   }
   100% {
-    top: -24%;
+    top: -300px;
     opacity: 0;
   }
 }
