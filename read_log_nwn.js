@@ -590,6 +590,7 @@ const openFiles = (listeFiles, search, searchOptions) => {
                   const searchFail = document.querySelector('#searchFiles .search_fail')
                   searchFail.innerHTML = `<span>La recherche du mot <strong>${searchOptions.termTosearch}</strong> n'a donnée aucun résultat</span>`
                   searchFail.classList.add('show')
+                  body.classList.remove('wait')
                }
             }
 
