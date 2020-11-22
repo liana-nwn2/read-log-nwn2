@@ -24,6 +24,9 @@ body .container {
   opacity: 1;
   transition: opacity 0.3s ease;
 }
+body.wait {
+  cursor: wait !important;
+}
 body.wait .container {
   opacity: 0.4;
   pointer-events: none;
@@ -213,6 +216,10 @@ ul {
   overflow-y: auto;
   overflow-x: hidden;
 }
+.table_container .file_content {
+  display: flex;
+  flex-direction: row;
+}
 .table_container.resize > div {
   position: absolute;
   height: 50%;
@@ -288,6 +295,7 @@ table {
   font-size: 13px;
   border-collapse: collapse;
   height: 100%;
+  width: 100%;
 }
 
 tbody tr {
@@ -435,6 +443,27 @@ td.pjName.btn:hover {
 }
 td.pjName.btn:hover::after {
   display: block;
+}
+td span.traduc {
+  font-family: "Trebuchet MS", Arial, Sans-Serif, serif;
+  padding-left: 30px;
+  opacity: 0.7;
+  position: relative;
+  overflow: hidden;
+}
+td span.traduc i {
+  font-variant: all-small-caps;
+}
+td span.traduc::before {
+  position: absolute;
+  content: "";
+  display: block;
+  width: 0;
+  height: 0;
+  border-top: 5px solid #ff6600;
+  border-right: 5px solid transparent;
+  top: 1px;
+  left: 0;
 }
 
 .openFolder {
