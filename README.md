@@ -11,15 +11,16 @@ Mise en forme des logs nwn2 générés par le ClientExtension
 (sous windows ils sont dans le dossier __[Documents › NevewinterNights2 › log › pj]__)  
   
 
-23/11/2020
+__23/11/2020__
 - Version FR / EN
 - Corrections de bugs
 - Prise en compte des langues.
 - La recherche prend en compte les langues
 
-19/11/2020
+__19/11/2020__
 - Correction de bugs.
 - Ajout d'une fonctionnalité de recherche.
+  
   
   
 __*** ATTENTION ***__  
