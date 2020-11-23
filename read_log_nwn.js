@@ -6,7 +6,7 @@ document.addEventListener("DOMContentLoaded", function (e) {
    const domToTranslate = document.querySelectorAll("[data-fr]")
 
    domToTranslate.forEach(thisDom => {
-      if (!navigatorLangFR) {
+      if (navigatorLangFR) {
          thisDom.textContent = thisDom.dataset.fr
       } else {
          thisDom.textContent = thisDom.dataset.en
