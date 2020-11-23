@@ -1,14 +1,20 @@
 document.addEventListener("DOMContentLoaded", function (e) {
 
-   /*
    // Détection de la langue
-   if (/^fr\b/.test(navigator.language)) {
 
-   } else {
+   let navigatorLangFR = /^fr\b/.test(navigator.language)
+   const domToTranslate = document.querySelectorAll("[data-fr]")
 
-   }
-    */
+   domToTranslate.forEach(thisDom => {
+      if (!navigatorLangFR) {
+         thisDom.textContent = thisDom.dataset.fr
+      } else {
+         thisDom.textContent = thisDom.dataset.en
+      }
+   })
 
+   document.getElementById('arrayRefSearch').value = ''
+   document.getElementById('languesListeRef').value = ''
 
    const folderPicker = document.getElementById("folderPicker")
    folderPicker.addEventListener("change", function (event) {
@@ -16,14 +22,13 @@ document.addEventListener("DOMContentLoaded", function (e) {
       const warningInfo = document.querySelector('.warning_info')
       let allFiles = initFileList(this.files)
       let listFiles = allFiles.chatLog
-      let languesFiles = allFiles.languesLog
 
       warningInfo.style.display = 'none'
 
       if (listFiles.length > 0) {
          // Récupère les langues
          openFiles(allFiles, 'langues', '')
-         
+
          // setupFileListing(listFiles)
          // sortFiles(document.getElementById('fileSort').checked)
 
@@ -108,9 +113,14 @@ const setStaticsEvents = (listingFilesUl) => {
 
    // QUITTE LE MODE RECHERCHE
    document.querySelector('.back_to_liste').addEventListener("click", function (e) {
-      setupFileListing(initFileList(document.getElementById("folderPicker").files))
+      setupFileListing(initFileList(document.getElementById("folderPicker").files).chatLog)
       this.classList.remove('show')
       document.querySelector('.table_container').classList.remove('resize')
+
+      const popupSearchFiles = document.getElementById('searchFiles')
+      popupSearchFiles.classList.replace('show', 'close')
+      popupSearchFiles.querySelector('#goSearch').textContent = "Lancer la recherche"
+      popupSearchFiles.querySelector('#goNewSearch').classList.add('disabled')
 
    })
 
@@ -341,7 +351,12 @@ const setDynamicsEvents = (listingFilesUl, fileListe) => {
          document.querySelector('.back_to_liste').classList.add('show')
 
       } else {
-         alert('ERREUR')
+         inputTermToSearch.classList.add('invalid')
+         if (/^fr\b/.test(navigator.language)) {
+            alert('Le champ de recherche ne doit pas être vide')
+         } else {
+            alert('The search field must not be empty')
+         }
       }
    }
 
@@ -564,8 +579,7 @@ const openFiles = (allFiles, mode, searchOptions) => {
 
    if (mode === 'langues') {
       listeFiles = allFiles.languesLog
-   }
-   else {
+   } else {
       listeFiles = allFiles
    }
 
@@ -621,7 +635,7 @@ const openFiles = (allFiles, mode, searchOptions) => {
                break
             case 'search' : {
 
-               result = searchInFile(thisLogFormatted, searchOptions)
+               result = searchInFile(thisFile.name, thisLogFormatted, searchOptions)
 
                if (result.datas.length > 0) {
                   searchResult.push({fileName: thisFile.name, datas: result.datas, allPos: result.numPos})
@@ -652,7 +666,19 @@ const openFiles = (allFiles, mode, searchOptions) => {
 
                   } else {
                      const searchFail = document.querySelector('#searchFiles .search_fail')
-                     searchFail.innerHTML = `<span>La recherche du mot <strong>${searchOptions.termTosearch}</strong> n'a donnée aucun résultat</span>`
+
+                     let searchFailedMsg
+
+                     if (/^fr\b/.test(navigator.language)) {
+                        searchFailedMsg = searchFail.dataset.fr
+                     } else {
+                        searchFailedMsg = searchFail.dataset.en
+                     }
+
+                     searchFailedMsg = searchFailedMsg.replace(/(\[\s%%%\s\])/g, `<strong>[ ${searchOptions.termTosearch} ]</strong>`)
+
+                     searchFail.innerHTML = `<span>${searchFailedMsg}</span>`
+                         //`<span>La recherche du mot <strong>${searchOptions.termTosearch}</strong> n'a donnée aucun résultat</span>`
                      searchFail.classList.add('show')
                      body.classList.remove('wait')
                   }
@@ -684,23 +710,61 @@ const openFiles = (allFiles, mode, searchOptions) => {
 // ---------------------------------------------------------
 //    RECHERCHE DU TERME
 // ---------------------------------------------------------
-const searchInFile = (thisLog, searchOptions) => {
+const searchInFile = (thisFileName, thisLog, searchOptions) => {
 
    let stringToFind = searchOptions.termTosearch
    let index = 0
    let allPos = 0
-   let pos
-   let founded
-   let newMessage
+   let doSearch = false
+   let pos, founded, newMessage, regEx
    let arrayResult = {datas: [], numPos: ''}
+
+   let languageInThisLog = JSON.parse(document.getElementById('languesListeRef').value)
+   let resultSearchLang = languageInThisLog.find(item => item.file === thisFileName.replace('Chatlog', 'Combatlog'))
+
+   let maj = searchOptions.checkCasse ? '' : 'i' // sensible à la casse ? oui : non / i : insensitive
+
+   if (searchOptions.wholeWord) {
+      // mot entier
+      regEx = new RegExp("(?<=^|[^a-zA-ZÀ-ÖØ-öø-ÿ])(" + stringToFind + ")(?=[^a-zA-ZÀ-ÖØ-öø-ÿ]|$)", "g" + maj)
+      // -> double anti-slash \\ pour une expression en string
+   } else {
+      // bout de mot
+      regEx = new RegExp(stringToFind, "g" + maj)
+   }
+
+   // CombatLog
+   if (resultSearchLang !== undefined) {
+
+      resultSearchLang.lines.forEach(line => {
+
+         line[4] = line[4].replace(/(<span class="highlight">.*?<\/span>)/g, "$&")
+
+         let matchWord
+         while ((matchWord = regEx.exec(line[4])) !== null) {
+            if (matchWord.index === regEx.lastIndex) {
+               regEx.lastIndex++
+            }
+            founded = true
+            allPos++
+         }
+
+         if (founded)
+            line[4] = line[4].replace(regEx, '<span class="highlight">$&</span>')
+
+      })
+
+      languageInThisLog.splice(languageInThisLog.indexOf(resultSearchLang), 1, resultSearchLang)
+      document.getElementById('languesListeRef').value = JSON.stringify(languageInThisLog)
+
+   }
+
 
    for (let thisLine of thisLog) {
       // récupère le début de la ligne : heure / compte / pj / msg type / message
       const search = /^[\[][0-9]{2}:[0-9]{2}] \[.*?\].*?: (\[.*?\]) ([^\[]+)/g
       let whileMatch = search.exec(thisLine)
-      let regEx
 
-      //allPos = 0
       founded = false
       pos = []
       newMessage = []
@@ -708,24 +772,14 @@ const searchInFile = (thisLog, searchOptions) => {
       if (whileMatch !== null) {
 
          let messageType = whileMatch[1].slice(1, -1).toLowerCase().trim()
-         let message = whileMatch[2].replaceAll(/(\r\n|\n|\r)/gm, "<br>") // récup le message + supprime les sauts de ligne et retours chariot
+         let message = whileMatch[2].replaceAll(/(\r\n|\n|\r)/gm, "<br>") // récup le message + remplace les sauts de ligne et retours chariot par '<br>'
 
          if ((messageType === 'tell' && !searchOptions.msgExcludeMp) ||
              (messageType === 'shout' && !searchOptions.msgExcludeShout) ||
              (messageType === 'party' && !searchOptions.msgExcludeParty) ||
              (messageType === 'talk' || messageType === 'whisper' || messageType === 'dialog')) {
 
-            let maj = searchOptions.checkCasse ? '' : 'i' // sensible à la casse ? oui : non / i : insensitive
-
-            if (searchOptions.wholeWord) {
-               // mot entier
-               regEx = new RegExp("(?<=^|[^a-zA-ZÀ-ÖØ-öø-ÿ])(" + stringToFind + ")(?=[^a-zA-ZÀ-ÖØ-öø-ÿ]|$)", "g" + maj)
-               // -> double anti-slash \\ pour une expression en string
-            } else {
-               // bout de mot
-               regEx = new RegExp(stringToFind, "g" + maj)
-            }
-
+            // ChatLog
             let matchWord
             while ((matchWord = regEx.exec(message)) !== null) {
                if (matchWord.index === regEx.lastIndex) {
@@ -736,7 +790,7 @@ const searchInFile = (thisLog, searchOptions) => {
             }
 
             if (founded) {
-               newMessage.push(message.replace(regEx, "<span class='highlight'>$&</span>"))
+               newMessage.push(message.replace(regEx, '<span class="highlight">$&</span>'))
             }
 
          }
@@ -784,7 +838,6 @@ const processLog = (thisLog, filename, resultByLine) => {
    let addRefLine
    let formattedTraducByLine// = ''
 
-
    let languageInThisLog = JSON.parse(document.getElementById('languesListeRef').value)
    let getFileLangue = languageInThisLog.find(item => item.file === filename.replace('Chatlog', 'Combatlog'))
 
@@ -793,14 +846,12 @@ const processLog = (thisLog, filename, resultByLine) => {
       getRef = refResult.find(item => item.fileName === filename)
    }
 
-   let prevHeure = ''
-
    for (let thisLine of thisLog) {
 
       // regex : [00:00] [pseudo] (optionnel) Nom du PJ : [Type de message] -> jusqu'à la fin de l'entrée
       let search = /^([\[][0-9]{2}:[0-9]{2}])( \[.*?\])?(.*?: )(\[.*?\]) ([^\[]+)/g
       let match = search.exec(thisLine)
-      let message = ''
+      let messageLang = '', message = ''
 
       if (match !== null) {
 
@@ -848,9 +899,45 @@ const processLog = (thisLog, filename, resultByLine) => {
             btn = 'btn'
          }
 
-         // Met en surbrilance le mot recherché dans la colonne message, si rien, la ligne n'est pas modifiée
          message = msg
          let searchedLine = false
+         let searchedLineTraduc = false
+
+         // Ajoute les langues
+         let withTraduc = false
+         let getLangueLine
+         formattedTraducByLine = ''
+
+         if (getFileLangue !== undefined) {
+            getLangueLine = getFileLangue.lines.filter(line => line[1] === heure)
+            withTraduc = getLangueLine.length > 0
+         }
+
+         if (withTraduc) {
+
+            let thisItemLangue = getLangueLine[0]
+
+            if (thisItemLangue[2].trim() === fullName && (msgType !== '[Tell]' && msgType !== '[Party]')) {
+
+               formattedTraducByLine = `<span class="traduc"><strong>${thisItemLangue[3]}</strong> ${thisItemLangue[4]}</span>`
+               // message = message + formattedTraducByLine
+
+               let regHighLight = /(<span class="highlight">.*?<\/span>)/g
+               if (regHighLight.test(thisItemLangue[4])) {
+                  searchedLineTraduc = true
+               }
+
+               if (getFileLangue !== undefined) {
+                  getFileLangue.lines.shift()
+
+               }
+
+            }
+
+         }
+
+         // Met en surbrilance le mot recherché dans la colonne message, si rien, la ligne n'est pas modifiée
+         // message = msg
          if (resultByLine && getRef !== undefined) {
 
             addRefLine = getRef.datas.find(item => item.numLigne === indexLine)
@@ -862,36 +949,10 @@ const processLog = (thisLog, filename, resultByLine) => {
 
          }
 
-         // Ajoute les traductions
-         let withTraduc = false
-         let getLangueLine
-         formattedTraducByLine = ''
+         //if (searchedLine || searchedLineTraduc) {
+         message = message + formattedTraducByLine
+         //}
 
-         if (getFileLangue !== undefined) {
-            getLangueLine = getFileLangue.lines.filter(line => line[1] === heure)
-            withTraduc = getLangueLine.length > 0
-         }
-
-         prevHeure = heure
-
-         if (prevHeure === heure) {
-
-            if (withTraduc) {
-
-               let thisItemLangue = getLangueLine[0]
-
-               if (thisItemLangue[2].trim() === fullName) {
-
-                  formattedTraducByLine = `<span class="traduc"><i>${thisItemLangue[3]}</i> ${thisItemLangue[4]}</span>`
-                  message = message + formattedTraducByLine
-
-                  if (getFileLangue !== undefined)
-                     getFileLangue.lines.shift()
-
-               }
-            }
-
-         }
 
          // Ligne du tableau à ajouter
          let formattedLine = `<tr>
@@ -900,12 +961,12 @@ const processLog = (thisLog, filename, resultByLine) => {
                                  <td class="pseudo ${hideLinePseudo}" style="color: ${lineColor}">${pseudo}</td>
                                  <td class="pjName ${btn}" style="color: ${lineColor}" data-fullName = "${fullName}">${pjName}</td>
                                  <td class="${msgClass} msgType ${hideLineMsgType}" title="${msgClass}"><span>${msgType}</span></td>
-                                 <td class="${msgClass} message" style="color: ${lineColor}">${message}</td>                                 
+                                 <td class="${msgClass} message" style="color: ${lineColor}"><div>${message}</div></td>                                 
                               </tr>`
 
          formattedContent.push(formattedLine)
 
-         if (searchedLine) {
+         if (searchedLine || searchedLineTraduc) {
             formattedSearch.push(formattedLine)
          }
 
@@ -922,7 +983,13 @@ const processLog = (thisLog, filename, resultByLine) => {
 
       const popupSearchFiles = document.getElementById('searchFiles')
       popupSearchFiles.classList.replace('show', 'close')
-      popupSearchFiles.querySelector('#goSearch').textContent = "Poursuivre la recherche"
+
+      const btnGoSearch = popupSearchFiles.querySelector('#goSearch')
+      if (/^fr\b/.test(navigator.language)) {
+         btnGoSearch.textContent = btnGoSearch.dataset.frNext
+      } else {
+         btnGoSearch.textContent = btnGoSearch.dataset.enNext
+      }
       popupSearchFiles.querySelector('#goNewSearch').classList.remove('disabled')
    }
 

@@ -1,0 +1,80 @@
+//---------------------------------
+// Global Colors
+//---------------------------------
+$fontDefault: #555466;
+
+$btnPrimary: #2c73e1;
+$btnPrimary_hover: #1865db;
+$btnSecondary: #ff8230;
+$btnSecondary_hover: #f60;
+$btnAlt: #25ae54;
+$btnAlt_hover: #2dac0a;
+
+$shadowSolid: #6A759F;
+$shadowDefault: rgba($shadowSolid, 0.6);
+
+$placeholder: rgb(106, 117, 159);
+$whiteDefault: #fff;
+$lightGrey: #f7f7f7;
+$lightGrey_1: #efeff3;
+$lightGrey_2: #e5e7ea;
+$lightGrey_3: #c5c5d9;
+$darkGrey: #414951;
+$border: #878c93;
+$lightBorder: #e6e6f4;
+$lightBorder_1: #efeff3;
+$altBlue: #5185e8;
+
+$focusColor: #f60;
+$closeBtnSearch: #ff8324;
+$input_border: #abb6d2;
+$input_invalid: coral;
+$selected: #2dac0a;
+$highLight: #ef0fff;
+
+$bgSearchResult : #fdfdfd;
+
+$handle_bottom: rgba($shadowSolid, 0.2);
+$handle_shadow: rgba($shadowSolid, 0.5);
+$handle_caption_shadow: rgba($shadowSolid, 0.3);
+$handle_caption_border: rgba($shadowSolid, 0.4);
+$handle_caption: #f60;
+
+$popup_shadow: rgba(0, 0, 0, 0.2);
+$popup_border: #d6dbe9;
+$info: #e35049;
+
+$colTable_shadow: rgba($shadowSolid, 0.3);
+
+
+//---------------------------------
+// Log Content Colors
+//---------------------------------
+$td_border : #d5d5dd;
+
+$col_index: #978e5f;
+$col_index_bg: #f4f3e9;
+$col_index_focus: #0087ff;
+
+$col_heure: #958c61;
+$col_heure_bg: #fffce5;
+
+$msgType: #778999;
+$message: #8e8ea4;
+
+$traduc_before: #f60;
+
+$whisper_bg : #f6fafd;
+$whisper_border : #a9c4f7;
+
+$tell_bg : #F7FFF5;
+$tell_border : #81D081;
+
+$shout_bg : #FFFEED;
+$shout_border : #ffdb1a;
+
+$party_bg : #F9F9F9;
+$party_border : #dbdbdb;
+
+$serverTell_bg : #b6c0ca;
+$serverTell_border : #EFF1F3;
