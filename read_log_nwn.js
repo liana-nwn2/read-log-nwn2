@@ -22,11 +22,10 @@ document.addEventListener("DOMContentLoaded", function (e) {
 
       if (listFiles.length > 0) {
          // Récupère les langues
-         openFiles(languesFiles, 'langues', '')
-
-         setupFileListing(listFiles)
-         sortFiles(document.getElementById('fileSort').checked)
-
+         openFiles(allFiles, 'langues', '')
+         
+         // setupFileListing(listFiles)
+         // sortFiles(document.getElementById('fileSort').checked)
 
       } else {
          warningInfo.style.display = 'flex'
@@ -551,15 +550,24 @@ const resizeResult = () => {
 // ---------------------------------------------------------
 //    OUVERTURE D'UN LOG
 // ---------------------------------------------------------
-const openFiles = (listeFiles, mode, searchOptions) => {
+const openFiles = (allFiles, mode, searchOptions) => {
 
    const body = document.body
+
+   let listeFiles
 
    let fileindex = 1
    let languesLines = []
    let searchResult = []
    let newFileListe = []
    let allPos = []
+
+   if (mode === 'langues') {
+      listeFiles = allFiles.languesLog
+   }
+   else {
+      listeFiles = allFiles
+   }
 
    body.classList.add('wait')
 
@@ -603,6 +611,10 @@ const openFiles = (listeFiles, mode, searchOptions) => {
                if (fileindex === listeFiles.length) {
                   document.getElementById('languesListeRef').value = JSON.stringify(languesLines)
                   body.classList.remove('wait')
+
+                  setupFileListing(allFiles.chatLog)
+                  sortFiles(document.getElementById('fileSort').checked)
+
                }
 
             }
