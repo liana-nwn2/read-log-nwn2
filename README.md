@@ -14,8 +14,8 @@ Mise en forme des logs nwn2 générés par le ClientExtension
 __23/11/2020__
 - Version FR / EN
 - Corrections de bugs
-- Prise en compte des langues.
 - La recherche prend en compte les langues
+- Prise en compte des langues.
 
 __19/11/2020__
 - Correction de bugs.
