@@ -12,6 +12,9 @@ Mise en forme des logs nwn2 générés par le ClientExtension
 4/ Pour lancer une recherche, clique sur le bouton orange avec une loupe.  
 -> Pour quitter le mode recherche et revenir à la liste des fichiers, cliquer sur le gros bouton orange en haut à gauche.  
   
+__23/11/2020__
+- Ajout d'une liste de pj/pnj par log (accessible via le petit bouton vert en haut à droite).
+- Corrections de bugs
 
 __23/11/2020__
 - Version FR / EN
