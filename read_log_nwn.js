@@ -110,6 +110,33 @@ const setupFileListing = (fileListe, search, occurences) => {
 // ---------------------------------------------------------
 const setStaticsEvents = (listingFilesUl) => {
 
+   // AFFICHE LES INFOS DU LOG
+   const statsInfo = document.getElementById('statsInfo')
+
+   statsInfo.querySelector('.icon').style.right = '-40px'
+
+   statsInfo.querySelector('.icon').addEventListener("click", function (e) {
+
+      const blocDetails = statsInfo.querySelector('.details')
+
+      if (statsInfo.offsetWidth === 1) {
+
+         statsInfo.style.width = 270//blocDetails.offsetWidth + 16 +14
+         this.style.width = 'auto'
+         this.style.left = 0
+         this.style.borderRadius = 0
+         // this.style.opacity = 1
+
+      } else {
+         statsInfo.style.width = 1
+         this.style.left = 'inherit'
+         this.style.width = 40
+         this.style.borderRadius = '0 0 0 6px'
+         // this.style.opacity = 0.6
+      }
+
+
+   })
 
    // QUITTE LE MODE RECHERCHE
    document.querySelector('.back_to_liste').addEventListener("click", function (e) {
@@ -527,6 +554,53 @@ const tableResultListeners = () => {
    cellPjFullName.forEach(fullName => fullName.onmouseenter = mouseIn)
    cellPjFullName.forEach(fullName => fullName.onmouseleave = mouseOut)
 
+   // Click sur la liste des participants
+
+   const statsInfoDetails = document.querySelectorAll('#statsInfo li > span:nth-last-child(-n+2)')
+
+   statsInfoDetails.forEach(thisBtn => {
+
+      let loop = 0
+
+      thisBtn.onclick = function (e) {
+
+         const thisBtn = e.target
+         const thisPjNum = thisBtn.closest('li').dataset.numpj
+
+         let allLinesPj = document.querySelectorAll('#fileContent tr[data-numpj="' + thisPjNum + '"]')
+         document.querySelectorAll('#fileContent td.index').forEach(line => line.classList.remove('focus'))
+
+         if (thisBtn.className === 'plus') {
+
+            loop = thisBtn.dataset.currentIndex
+            loop++
+
+            if (loop > allLinesPj.length - 1) {
+               loop = 0
+            }
+
+            thisBtn.dataset.currentIndex = loop
+
+         } else if (thisBtn.className === 'moins') {
+
+            loop = thisBtn.previousSibling.dataset.currentIndex
+            loop--
+            if (loop < 0) {
+               loop = allLinesPj.length - 1
+            }
+            thisBtn.previousSibling.dataset.currentIndex = loop
+
+         }
+
+         if (allLinesPj[loop]) {
+            allLinesPj[loop].scrollIntoView({behavior: "smooth", block: 'start', inline: 'start'})
+            allLinesPj[loop].querySelector('td.index').classList.add('focus')
+         }
+
+      }
+   })
+
+
 }
 
 // ---------------------------------------------------------
@@ -628,6 +702,7 @@ const openFiles = (allFiles, mode, searchOptions) => {
 
                   setupFileListing(allFiles.chatLog)
                   sortFiles(document.getElementById('fileSort').checked)
+                  document.querySelector('#statsInfo .icon').style.right = 0
 
                }
 
@@ -678,7 +753,7 @@ const openFiles = (allFiles, mode, searchOptions) => {
                      searchFailedMsg = searchFailedMsg.replace(/(\[\s%%%\s\])/g, `<strong>[ ${searchOptions.termTosearch} ]</strong>`)
 
                      searchFail.innerHTML = `<span>${searchFailedMsg}</span>`
-                         //`<span>La recherche du mot <strong>${searchOptions.termTosearch}</strong> n'a donnée aucun résultat</span>`
+                     //`<span>La recherche du mot <strong>${searchOptions.termTosearch}</strong> n'a donnée aucun résultat</span>`
                      searchFail.classList.add('show')
                      body.classList.remove('wait')
                   }
@@ -949,13 +1024,10 @@ const processLog = (thisLog, filename, resultByLine) => {
 
          }
 
-         //if (searchedLine || searchedLineTraduc) {
          message = message + formattedTraducByLine
-         //}
-
 
          // Ligne du tableau à ajouter
-         let formattedLine = `<tr>
+         let formattedLine = `<tr data-numPj = ${indexPjName}>
                                  <td class="index" data-index="${indexLine + 1}">${indexLine + 1}</td>
                                  <td class="heure">${heure}</td>
                                  <td class="pseudo ${hideLinePseudo}" style="color: ${lineColor}">${pseudo}</td>
@@ -966,6 +1038,7 @@ const processLog = (thisLog, filename, resultByLine) => {
 
          formattedContent.push(formattedLine)
 
+         // si un mot a été trouvé on ajoute la ligne au tableau des résultats
          if (searchedLine || searchedLineTraduc) {
             formattedSearch.push(formattedLine)
          }
@@ -991,11 +1064,20 @@ const processLog = (thisLog, filename, resultByLine) => {
          btnGoSearch.textContent = btnGoSearch.dataset.enNext
       }
       popupSearchFiles.querySelector('#goNewSearch').classList.remove('disabled')
+
    }
 
-   // if (getFileLangue !== null) {
-   //    document.querySelector('.traducByLine_container .traducByLine tbody').innerHTML = formattedTraduc.join('')
-   // }
+   // Liste tous les participants du log
+   const statsInfoDetails = document.querySelector('#statsInfo')
+   let liLineName = []
+
+   statsInfoDetails.querySelector('.pj_count > span > span').textContent = listColors.names.length
+
+   for (let index in listColors.names) {
+      liLineName.push(`<li data-numPj="${index}" style="color: ${listColors.colors[index]}"><span>${listColors.names[index]}</span><span class="plus" data-current-index="-1"></span><span class="moins"></span></li>`)
+   }
+   statsInfoDetails.querySelector('.details').innerHTML = `<ul>${liLineName.join('')}</ul>`
+
 
    // Charge le array "formattedContent" dans le tableau <table/>
    fileContentTable.innerHTML = formattedContent.join('')
