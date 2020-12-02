@@ -1,0 +1,49 @@
+{
+  "name": " ",
+  "version": "0.0.1",
+  "description": "",
+  "keywords": "",
+  "license": "",
+  "author": "",
+  "main": "main.js",
+  "source": true,
+  "scripts": {
+    "build": "parcel build nwn2_read_log.html --no-content-hash",
+    "dev": "parcel nwn2_read_log.html --open",
+    "start": "npm run build && npm run dev",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "devDependencies": {
+    "@babel/core": "^7.12.9",
+    "autoprefixer": "^9.8.6",
+    "parcel-plugin-nuke-dist": "^1.0.1",
+    "parcel-plugin-custom-dist-structure": "^1.1.16",
+    "postcss-modules": "^4.0.0",
+    "sass": "^1.29.0"
+  },
+  "dependencies": {
+    "parcel": "^1.12.4"
+  },
+  "babel": {
+    "presets": [
+      [
+        "@babel/env",
+        {
+          "targets": {
+            "edge": "17",
+            "firefox": "60",
+            "chrome": "67",
+            "safari": "11.1"
+          },
+          "useBuiltIns": "usage",
+          "corejs": "3.6.5"
+        }
+      ]
+    ]
+  },
+  "postcss": {
+    "plugins": {
+      "autoprefixer": true
+    }
+  }
+}
