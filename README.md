@@ -12,7 +12,7 @@ Mise en forme des logs nwn2 générés par le ClientExtension
 4/ Pour lancer une recherche, clique sur le bouton orange avec une loupe.  
 -> Pour quitter le mode recherche et revenir à la liste des fichiers, cliquer sur le gros bouton orange en haut à gauche.  
   
-__02/11/2020__
+__02/12/2020__
 - Meilleur compatibilité avec les navigateurs (JS/CSS stricte + sources)
 - Améliorations générale.
 
