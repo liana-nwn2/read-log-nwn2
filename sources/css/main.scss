@@ -100,6 +100,7 @@ ul {
       z-index: 1;
       background-color: $whiteDefault;
       box-shadow: -2px 1px 4px $shadowDefault;
+      
       label {
          vertical-align: calc(2px);
       }
@@ -528,6 +529,7 @@ td {
       display: none;
       width: 0;
    }
+   
    &.index {
       text-align: right;
       color: $col_index;
@@ -669,6 +671,7 @@ td {
          opacity: 0.7;
       }
    }
+   
    &.pjName {
       opacity: .85;
       white-space: nowrap;
@@ -737,6 +740,23 @@ td {
          border-right: 5px solid transparent;
          top: 1px;
          left: 0;
+      }
+   }
+}
+
+#fileContent tbody tr.traduc {
+   border-top: none;
+   
+   td {
+      padding-top: 0;
+      padding-bottom: 7px;
+      
+      &.heure, &.pseudo, &.pjName {
+         text-indent: -90000px;
+      }
+      
+      &.msgType.no-svg {
+         background-image: none !important;
       }
    }
 }

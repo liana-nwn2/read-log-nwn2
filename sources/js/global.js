@@ -21,13 +21,18 @@ const domLoaded = function () {
 
       const warningInfo = document.querySelector('.warning_info')
       let allFiles = initFileList(this.files)
-      let listFiles = allFiles.chatLog
+      let chatLog = allFiles.chatLog
+      let combatLog = allFiles.combatLog
 
       warningInfo.style.display = 'none'
 
-      if (listFiles.length > 0) {
-         // Récupère les langues
+      if (chatLog.length > 0 && combatLog.length > 0) {
+
          openFiles(allFiles, 'langues', '')
+
+      } else if (chatLog.length > 0 && combatLog.length === 0) {
+
+         openFiles(chatLog, 'process', '')
 
       } else {
          warningInfo.style.display = 'flex'
@@ -64,7 +69,7 @@ const initFileList = (listFiles) => {
 
    }
 
-   return {chatLog: logFilesDef, languesLog: traducFilesDef}
+   return {chatLog: logFilesDef, combatLog: traducFilesDef}
 
 }
 // ---------------------------------------------------------
@@ -221,10 +226,14 @@ const setStaticsEvents = (listingFilesUl) => {
 
       if (termToSearch.length > 2 && !verifSpaces) {
          this.classList.remove('invalid')
+         if (e.key === 'Enter') {
+            document.getElementById('goSearch').click()
+         }
       } else if (verifSpaces) {
          this.classList.add('invalid')
          this.value = ''
       }
+
 
    })
 
@@ -261,6 +270,8 @@ const setStaticsEvents = (listingFilesUl) => {
       if (popupSearch.classList.contains('close') || popupSearch.classList.length === 0) {
          popupSearch.classList.remove('close')
          popupSearch.classList.add('show')
+         popupSearch.querySelector('#goSearch').focus()
+
       } else {
          popupSearch.classList.add('close')
          popupSearch.classList.remove('show')
@@ -679,7 +690,7 @@ const openFiles = (allFiles, mode, searchOptions) => {
 
    const body = document.body
 
-   let listeFiles
+   let listeFiles = allFiles
 
    let fileindex = 1
    let languesLines = []
@@ -688,9 +699,7 @@ const openFiles = (allFiles, mode, searchOptions) => {
    let allPos = []
 
    if (mode === 'langues') {
-      listeFiles = allFiles.languesLog
-   } else {
-      listeFiles = allFiles
+      listeFiles = allFiles.combatLog
    }
 
    body.classList.add('wait')
@@ -704,19 +713,16 @@ const openFiles = (allFiles, mode, searchOptions) => {
          fileReader.onloadend = () => resolve(fileReader.result)
       })
 
-      // fileResult.push(filePromise)
-
       Promise.all([filePromise]).then(fileContents => {
 
          let matchLineSearch, thisLogFormatted, result
 
-         matchLineSearch = /([\[][0-9]{2}:[0-9]{2}] .*?: \[.*?\] [^\[]+)/g
+         matchLineSearch = /([\[][0-9]{2}:[0-9]{2}] .*?: \[.*?\] [^\[]+)$/gm
          thisLogFormatted = fileContents.join('').match(new RegExp(matchLineSearch))
 
          switch (mode) {
             case 'langues' : {
 
-               // matchLineSearch = /^([\[][0-9]{2}:[0-9]{2}])\s<color=.*?>\s(.*?\s)(\(.*?\)\s)(.*?)<\/color>$/gm
                matchLineSearch = /^([\[][0-9]{2}:[0-9]{2}])\s<color=.*?>\s?(.*?\s):?(\(.*?\)\s)?(.*?)<\/color>$/gm
                thisLogFormatted = fileContents.join('').match(new RegExp(matchLineSearch))
 
@@ -724,8 +730,6 @@ const openFiles = (allFiles, mode, searchOptions) => {
                   let line = thisLogFormatted[index]
                   let newLine
                   newLine = line.replace(/<color=.*?>\s?/g, '').replace(/<\/color>/g, '')
-                  // thisLogFormatted[index] = newLine
-                  // thisLogFormatted[index] = /([\[][0-9]{2}:[0-9]{2}])\s(.*?)\s(\(.*?\))\s(.*?)$/g.exec(newLine)
                   thisLogFormatted[index] = /^([\[][0-9]{2}:[0-9]{2}])\s(.*?)(\(.*\)|:)\s(.*?)$$/g.exec(newLine)
                }
 
@@ -739,7 +743,6 @@ const openFiles = (allFiles, mode, searchOptions) => {
                   setupFileListing(allFiles.chatLog, false)
                   sortFiles(document.getElementById('fileSort').checked)
                   document.querySelector('#statsInfo .icon').classList.add('close')
-                  //.style.right = '0'
 
                }
 
@@ -829,7 +832,6 @@ const searchInFile = (thisFileName, thisLog, searchOptions) => {
    let stringToFind = searchOptions.termTosearch
    let index = 0
    let allPos = 0
-   let doSearch = false
    let pos, founded, newMessage, regEx
    let arrayResult = {datas: [], numPos: ''}
 
@@ -875,8 +877,11 @@ const searchInFile = (thisFileName, thisLog, searchOptions) => {
 
 
    for (let thisLine of thisLog) {
+
+      thisLine = thisLine.replaceAll(/<[^>]*>/g, "")
+
       // récupère le début de la ligne : heure / compte / pj / msg type / message
-      const search = /^[\[][0-9]{2}:[0-9]{2}] \[.*?\].*?: (\[.*?\]) ([^\[]+)/g
+      const search = /^[\[][0-9]{2}:[0-9]{2}] \[.*?\].*?: (\[.*?\]) ([^\[]+)$/gm
       let whileMatch = search.exec(thisLine)
 
       founded = false
@@ -887,6 +892,23 @@ const searchInFile = (thisFileName, thisLog, searchOptions) => {
 
          let messageType = whileMatch[1].slice(1, -1).toLowerCase().trim()
          let message = whileMatch[2].replaceAll(/(\r\n|\n|\r)/gm, "<br>") // récup le message + remplace les sauts de ligne et retours chariot par '<br>'
+
+
+         // DMFI Modif Septirage
+         if (messageType.length > 12) {
+
+            let prevLine = thisLog[index - 1].replaceAll(/<[^>]*>/g, "")
+            let prevSearch = /^[\[][0-9]{2}:[0-9]{2}] \[.*?\].*?: (\[.*?\]) ([^\[]+)$/gm
+
+            let prevLineMatch = prevSearch.exec(prevLine)
+
+            messageType =  prevLineMatch[1].slice(1, -1).toLowerCase().trim()
+
+            let matchLang = /(^\([^>]*\)\s:\s)(.*)$/gm.exec(message)
+            message = `<span class="traduc"><strong>${matchLang[1]}</strong> ${matchLang[2]}</span>`
+
+         }
+
 
          if ((messageType === 'tell' && !searchOptions.msgExcludeMp) ||
              (messageType === 'shout' && !searchOptions.msgExcludeShout) ||
@@ -904,6 +926,7 @@ const searchInFile = (thisFileName, thisLog, searchOptions) => {
             }
 
             if (founded) {
+               // newMessage.push(message.replace(regEx, `<span class="highlight">${stringToFind}</span>`))
                newMessage.push(message.replace(regEx, '<span class="highlight">$&</span>'))
             }
 
@@ -933,7 +956,6 @@ const searchInFile = (thisFileName, thisLog, searchOptions) => {
 //    MISE EN FORME DU LOG
 // ---------------------------------------------------------
 
-// const processLog = (thisLog, filename, word, resultByLine) => {
 const processLog = (thisLog, filename, resultByLine) => {
 
    const fileContentTable = document.querySelector('#fileContent tbody')
@@ -951,9 +973,13 @@ const processLog = (thisLog, filename, resultByLine) => {
    let refResult, getRef, indexLine = 0
    let addRefLine
    let formattedTraducByLine// = ''
+   let refLangue = document.getElementById('languesListeRef').value
+   let languageInThisLog, getFileLangue
 
-   let languageInThisLog = JSON.parse(document.getElementById('languesListeRef').value)
-   let getFileLangue = languageInThisLog.find(item => item.file === filename.replace('Chatlog', 'Combatlog'))
+   if (refLangue.length > 0 ) {
+      languageInThisLog = JSON.parse(refLangue)
+      getFileLangue = languageInThisLog.find(item => item.file === filename.replace('Chatlog', 'Combatlog'))
+   }
 
    if (resultByLine) {
       refResult = JSON.parse(document.getElementById('arrayRefSearch').value)
@@ -962,18 +988,42 @@ const processLog = (thisLog, filename, resultByLine) => {
 
    for (let thisLine of thisLog) {
 
+      thisLine = thisLine.replaceAll(/<[^>]*>/g, "")
+
       // regex : [00:00] [pseudo] (optionnel) Nom du PJ : [Type de message] -> jusqu'à la fin de l'entrée
-      let search = /^([\[][0-9]{2}:[0-9]{2}])( \[.*?\])?(.*?: )(\[.*?\]) ([^\[]+)/g
+      const search = /^([\[][0-9]{2}:[0-9]{2}])( \[.*?\])?(.*?: )(\[.*?\]) ([^\[]+)$/gm
+
       let match = search.exec(thisLine)
-      let messageLang = '', message = ''
+      let dmfiSeptiLangue = false
+      let message = ''
 
       if (match !== null) {
 
          let heure = match[1]
-         let pseudo = match[2] === undefined ? '(pnj ou dm)' : match[2]
+         let pseudo = match[2] === undefined ? '(pnj ou dm)' : match[2].trim()
          let pjName = match[3].trim().slice(0, -1)
          let msgType = match[4]
          let msg = match[5].replaceAll(/(\r\n|\n|\r)/gm, "<br>")
+
+         // DMFI Modif Septirage
+         if (pseudo === '[Server]' && msgType.length > 12) {
+
+            let prevLine = thisLog[indexLine - 1].replaceAll(/<[^>]*>/g, "")
+            let prevSearch = /^([\[][0-9]{2}:[0-9]{2}])( \[.*?\])?(.*?: )(\[.*?\]) ([^\[]+)$/gm
+
+            let prevLineMatch = prevSearch.exec(prevLine)
+
+            pseudo = prevLineMatch[2].trim()
+            pjName = prevLineMatch[3].trim().slice(0, -1)
+            msgType = prevLineMatch[4]
+
+            let matchLang = /(^\([^>]*\)\s:\s)(.*)$/gm.exec(msg)
+            msg = `<span class="traduc"><strong>${matchLang[1]}</strong> ${matchLang[2]}</span>`
+
+            dmfiSeptiLangue = true
+
+         }
+
 
          // supprime les crochets + les espaces et passe tout en minuscule -> le type de message est utilisé en CSS.class
          let msgClass = msgType.slice(1, -1).replaceAll(' ', '').toLowerCase()
@@ -987,7 +1037,6 @@ const processLog = (thisLog, filename, resultByLine) => {
          let hideLineMsgType = hideColDialogType ? 'hide' : ''
 
          // Applique une couleur à chaque pj/pnj (si "undefined" -> message serveur -> gris par défaut)
-         // let lineColor = `hsl(${listColors.colors[listColors.names.indexOf(pjName)]}, 80%, 35%)`
          let indexPjName = listColors.names.indexOf(pjName)
          let lineColor = listColors.colors[indexPjName] === undefined ? '#b6c0ca' : listColors.colors[indexPjName]
 
@@ -1063,14 +1112,22 @@ const processLog = (thisLog, filename, resultByLine) => {
 
          message = message + formattedTraducByLine
 
+         let trClass = ''
+         if (dmfiSeptiLangue) {
+            // pseudo = ''
+            // pjName = ''
+            msgClass += ' no-svg'
+            trClass = 'class = "traduc"'
+         }
+
          // Ligne du tableau à ajouter
-         let formattedLine = `<tr data-numPj = ${indexPjName}>
+         let formattedLine = `<tr data-numPj = ${indexPjName} ${trClass}>
                                  <td class="index" data-index="${indexLine + 1}">${indexLine + 1}</td>
                                  <td class="heure">${heure}</td>
                                  <td class="pseudo ${hideLinePseudo}" style="color: ${lineColor}">${pseudo}</td>
                                  <td class="pjName ${btn}" style="color: ${lineColor}" data-fullName = "${fullName}">${pjName}</td>
-                                 <td class="${msgClass} msgType ${hideLineMsgType}" title="${msgClass}"><span>${msgType}</span></td>
-                                 <td class="${msgClass} message" style="color: ${lineColor}"><div>${message}</div></td>                                 
+                                 <td class="msgType ${msgClass} ${hideLineMsgType}" title="${msgClass}"><span>${msgType}</span></td>
+                                 <td class="message ${msgClass}" style="color: ${lineColor}"><div>${message}</div></td>                                 
                               </tr>`
 
          formattedContent.push(formattedLine)
