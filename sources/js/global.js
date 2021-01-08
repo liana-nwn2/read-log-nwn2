@@ -1013,7 +1013,7 @@ const processLog = (thisLog, filename, resultByLine) => {
 
             let prevLineMatch = prevSearch.exec(prevLine)
 
-            pseudo = prevLineMatch[2].trim()
+            pseudo = prevLineMatch[2] === undefined ? "(pnj ou dm)" : prevLineMatch[2].trim()
             pjName = prevLineMatch[3].trim().slice(0, -1)
             msgType = prevLineMatch[4]
 
