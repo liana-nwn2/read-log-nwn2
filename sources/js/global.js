@@ -757,7 +757,9 @@ const openFiles = (allFiles, mode, searchOptions) => {
                   newFileListe.push(thisFile)
                }
 
-               if (fileindex === listeFiles.length) {
+               let fileTotal = listeFiles.length
+               fileTotal = fileTotal === 0 ? 1 : fileTotal -1
+               if (fileindex === fileTotal) {
 
                   if (searchResult.length > 0) {
 
@@ -832,7 +834,7 @@ const searchInFile = (thisFileName, thisLog, searchOptions) => {
    let stringToFind = searchOptions.termTosearch
    let index = 0
    let allPos = 0
-   let pos, founded, newMessage, regEx
+   let pos, founded, newMessage, regEx, message, messageType
    let arrayResult = {datas: [], numPos: ''}
 
    let languageInThisLog = JSON.parse(document.getElementById('languesListeRef').value)
@@ -878,10 +880,11 @@ const searchInFile = (thisFileName, thisLog, searchOptions) => {
 
    for (let thisLine of thisLog) {
 
-      thisLine = thisLine.replaceAll(/<[^>]*>/g, "")
+      //thisLine = thisLine.replaceAll(/<[^>]*>/g, "")
 
       // récupère le début de la ligne : heure / compte / pj / msg type / message
-      const search = /^[\[][0-9]{2}:[0-9]{2}] \[.*?\].*?: (\[.*?\]) ([^\[]+)$/gm
+      // const search = /^[\[][0-9]{2}:[0-9]{2}] \[.*?\].*?: (\[.*?\]) ([^\[]+)$/gm
+      const search = /^[\[][0-9]{2}:[0-9]{2}].\[.*?\].*?: (\[.*?\])(.*)$/gm
       let whileMatch = search.exec(thisLine)
 
       founded = false
@@ -890,23 +893,32 @@ const searchInFile = (thisFileName, thisLog, searchOptions) => {
 
       if (whileMatch !== null) {
 
-         let messageType = whileMatch[1].slice(1, -1).toLowerCase().trim()
-         let message = whileMatch[2].replaceAll(/(\r\n|\n|\r)/gm, "<br>") // récup le message + remplace les sauts de ligne et retours chariot par '<br>'
-
+         messageType = whileMatch[1].slice(1, -1).toLowerCase().trim()
+         message = whileMatch[2].replaceAll(/(\r\n|\n|\r)/gm, "<br>") // récup le message + remplace les sauts de ligne et retours chariot par '<br>'
 
          // DMFI Modif Septirage
-         if (messageType.length > 12) {
+         if (messageType.length === 10 && messageType === "servertell" && index - 1 > 0 && message.match("<C=#EDBAB2>")) {
+
+            // message = message.replaceAll(/<[^>]*>/g, "")
+            message = message.replaceAll(/<(?!br\s*\/?)[^>]+>/g, "")
 
             let prevLine = thisLog[index - 1].replaceAll(/<[^>]*>/g, "")
-            let prevSearch = /^[\[][0-9]{2}:[0-9]{2}] \[.*?\].*?: (\[.*?\]) ([^\[]+)$/gm
+            // let prevSearch = /^[\[][0-9]{2}:[0-9]{2}] \[.*?\].*?: (\[.*?\]) ([^\[]+)$/gm
+            let prevSearch = /^[\[][0-9]{2}:[0-9]{2}] (.*?|\[.*?\].*?:) (\[.*?\])(.*)$/gm
 
             let prevLineMatch = prevSearch.exec(prevLine)
 
-            messageType =  prevLineMatch[1].slice(1, -1).toLowerCase().trim()
+            messageType = prevLineMatch[2].slice(1, -1).toLowerCase().trim()
 
-            let matchLang = /(^\([^>]*\)\s:\s)(.*)$/gm.exec(message)
-            message = `<span class="traduc"><strong>${matchLang[1]}</strong> ${matchLang[2]}</span>`
+            // let matchLang = /(^\([^>]*\)\s:\s)(.*)$/gm.exec(message)
+            let matchLang = /^\[.*?\]\s\((.*?)\)\s:\s(.*?)$/gm.exec(message.trim())
+            if (matchLang !== null) {
+               message = `<span class="traduc"><strong>${matchLang[1]}</strong> ${matchLang[2]}</span>`
+            }
 
+         } else {
+            // message = message.replaceAll(/<[^>]*>/g, "")
+            message = message.replaceAll(/<(?!br\s*\/?)[^>]+>/g, "")
          }
 
 
@@ -917,6 +929,7 @@ const searchInFile = (thisFileName, thisLog, searchOptions) => {
 
             // ChatLog
             let matchWord
+
             while ((matchWord = regEx.exec(message)) !== null) {
                if (matchWord.index === regEx.lastIndex) {
                   regEx.lastIndex++
@@ -976,7 +989,7 @@ const processLog = (thisLog, filename, resultByLine) => {
    let refLangue = document.getElementById('languesListeRef').value
    let languageInThisLog, getFileLangue
 
-   if (refLangue.length > 0 ) {
+   if (refLangue.length > 0) {
       languageInThisLog = JSON.parse(refLangue)
       getFileLangue = languageInThisLog.find(item => item.file === filename.replace('Chatlog', 'Combatlog'))
    }
@@ -988,14 +1001,18 @@ const processLog = (thisLog, filename, resultByLine) => {
 
    for (let thisLine of thisLog) {
 
-      thisLine = thisLine.replaceAll(/<[^>]*>/g, "")
+      // thisLine = thisLine.replaceAll(/<[^>]*>/g, "")
+      thisLine = thisLine.replaceAll(/(\n\r|\r\n|\n|\r)/gm, "<br>")
+
 
       // regex : [00:00] [pseudo] (optionnel) Nom du PJ : [Type de message] -> jusqu'à la fin de l'entrée
-      const search = /^([\[][0-9]{2}:[0-9]{2}])( \[.*?\])?(.*?: )(\[.*?\]) ([^\[]+)$/gm
+      // const search = /^([\[][0-9]{2}:[0-9]{2}])( \[.*?\])?(.*?: )(\[.*?\]) ([^\[]+)$/gm
+      const search = /^([\[][0-9]{2}:[0-9]{2}])( \[.*?\])?(.*?: )(\[.*?\]) (.*?)$/gm
 
       let match = search.exec(thisLine)
       let dmfiSeptiLangue = false
       let message = ''
+      let msg = ''
 
       if (match !== null) {
 
@@ -1003,25 +1020,34 @@ const processLog = (thisLog, filename, resultByLine) => {
          let pseudo = match[2] === undefined ? '(pnj ou dm)' : match[2].trim()
          let pjName = match[3].trim().slice(0, -1)
          let msgType = match[4]
-         let msg = match[5].replaceAll(/(\r\n|\n|\r)/gm, "<br>")
+         msg = match[5]//.replaceAll(/(\r\n|\n|\r)/gm, "<br>")
 
          // DMFI Modif Septirage
-         if (pseudo === '[Server]' && msgType.length > 12) {
+         // if (pseudo === '[Server]' && msgType === '[ServerTell]' && indexLine - 1 > 0) {
+         if (pseudo === '[Server]' && msgType === '[ServerTell]' && indexLine - 1 > 0 && msg.match("<C=#EDBAB2>")) {
 
+            // msg = msg.replaceAll(/<[^>]*>/g, "")
+            // /<(?!br\s*\/?)[^>]+>/g, ''
+            msg = msg.replaceAll(/<(?!br\s*\/?)[^>]+>/g, "")
             let prevLine = thisLog[indexLine - 1].replaceAll(/<[^>]*>/g, "")
-            let prevSearch = /^([\[][0-9]{2}:[0-9]{2}])( \[.*?\])?(.*?: )(\[.*?\]) ([^\[]+)$/gm
-
+            // let prevSearch = /^([\[][0-9]{2}:[0-9]{2}])( \[.*?\])?(.*?: )(\[.*?\]) ([^\[]+)$/gm
+            let prevSearch = /^([\[][0-9]{2}:[0-9]{2}])( \[.*?\])?(.*?: )(\[.*?\])(.*)$/gm
             let prevLineMatch = prevSearch.exec(prevLine)
 
             pseudo = prevLineMatch[2] === undefined ? "(pnj ou dm)" : prevLineMatch[2].trim()
             pjName = prevLineMatch[3].trim().slice(0, -1)
             msgType = prevLineMatch[4]
 
-            let matchLang = /(^\([^>]*\)\s:\s)(.*)$/gm.exec(msg)
-            msg = `<span class="traduc"><strong>${matchLang[1]}</strong> ${matchLang[2]}</span>`
+            // let matchLang = /(^\([^>]*\)\s:\s)(.*)$/gm.exec(msg)
+            let matchLang = /^\[.*?\]\s\((.*?)\)\s:\s(.*?)$/gm.exec(msg)
+            if (matchLang !== null) {
+               msg = `<span class="traduc"><strong>${matchLang[1]}</strong> ${matchLang[2]}</span>`
+               dmfiSeptiLangue = true
+            }
 
-            dmfiSeptiLangue = true
-
+         } else {
+            // msg = msg.replaceAll(/<[^>]*>/g, "")
+            msg = msg.replaceAll(/<(?!br\s*\/?)[^>]+>/g, "")
          }
 
 

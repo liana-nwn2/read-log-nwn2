@@ -525,9 +525,11 @@ tbody tr {
 
 
 td {
+   
    &.hide {
       display: none;
       width: 0;
+      //visibility: hidden;
    }
    
    &.index {
@@ -563,6 +565,7 @@ td {
       color: $msgType;
       font-size: 9px;
       text-align: center;
+      position: relative;
       
       &.whisper {
          @extend .svg_whisper;
@@ -593,18 +596,28 @@ td {
       background-position: center 5px;
       min-width: 28px;
       
-      span {
+      span:first-child {
          margin-top: 3px;
          display: block;
          overflow: hidden;
          text-indent: -1100000px;
       }
+      
+      //span:last-child {
+      //   display: none;
+      //   visibility: visible;
+      //}
+
    }
    
    &.message {
       color: $message;
       width: 100%;
       padding-right: 17px;
+      
+      div {
+         display: inline;
+      }
       
       br {
          line-height: 0;
@@ -720,14 +733,16 @@ td {
    
    span.traduc {
       font-family: "Trebuchet MS", Arial, Sans-Serif, serif;
-      padding-left: 30px;
+      padding-left: 15px;
       opacity: 0.7;
       position: relative;
       overflow: hidden;
+      display: block;
       
       strong {
          font-variant: all-small-caps;
          font-style: normal;
+         opacity: 0.45;
       }
       
       &::before {
@@ -742,6 +757,7 @@ td {
          left: 0;
       }
    }
+   
 }
 
 #fileContent tbody tr.traduc {
