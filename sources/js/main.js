@@ -5,9 +5,10 @@ if (module.hot) {
 }
 
 
-// import './plugins'
 // import './vendor/modernizr'
+import './plugins'
 import './global'
+//import './test'
 
 
 

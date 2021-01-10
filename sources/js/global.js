@@ -703,17 +703,23 @@ const openFiles = (allFiles, mode, searchOptions) => {
    }
 
    body.classList.add('wait')
+   const startTime = performance.now()
+   let duration
+
+   // console.warn(listeFiles.length)
 
    for (let thisFile of listeFiles) {
 
       // "Promise" sinon l'execution des fonctions démarrent avant la fin de la lecture de "FileReader"
       let filePromise = new Promise(resolve => {
          let fileReader = new FileReader()
-         fileReader.readAsText(thisFile)
-         fileReader.onloadend = () => resolve(fileReader.result)
+         fileReader.onload = () => resolve(fileReader.result)
+         //onloadend ?
+         fileReader.readAsText(thisFile, 'CP1251')
       })
 
       Promise.all([filePromise]).then(fileContents => {
+      // Promise.resolve([filePromise]).then(fileContents => {
 
          let matchLineSearch, thisLogFormatted, result
 
@@ -723,14 +729,14 @@ const openFiles = (allFiles, mode, searchOptions) => {
          switch (mode) {
             case 'langues' : {
 
-               matchLineSearch = /^([\[][0-9]{2}:[0-9]{2}])\s<color=.*?>\s?(.*?\s):?(\(.*?\)\s)?(.*?)<\/color>$/gm
+               matchLineSearch = /^([\[][0-9]{2}:[0-9]{2}])\s<color=lightgrey>\s?(.*?\s):?(\(.*?\)\s)?(.*?)<\/c.*?>$/gm
                thisLogFormatted = fileContents.join('').match(new RegExp(matchLineSearch))
 
                for (let index in thisLogFormatted) {
                   let line = thisLogFormatted[index]
                   let newLine
-                  newLine = line.replace(/<color=.*?>\s?/g, '').replace(/<\/color>/g, '')
-                  thisLogFormatted[index] = /^([\[][0-9]{2}:[0-9]{2}])\s(.*?)(\(.*\)|:)\s(.*?)$$/g.exec(newLine)
+                  newLine = line.replace(/<color=.*?>\s?/g, '').replace(/<\/c.*?>/g, '')
+                  thisLogFormatted[index] = /^([\[][0-9]{2}:[0-9]{2}])\s(.*?)(\(.*\)|:)\s(.*?)$/gm.exec(newLine)
                }
 
                if (thisLogFormatted !== null) {
@@ -757,9 +763,10 @@ const openFiles = (allFiles, mode, searchOptions) => {
                   newFileListe.push(thisFile)
                }
 
-               let fileTotal = listeFiles.length
-               fileTotal = fileTotal === 0 ? 1 : fileTotal -1
-               if (fileindex === fileTotal) {
+               // let fileTotal = listeFiles.length
+               // fileTotal = fileTotal === 0 ? 1 : fileTotal -1
+               // if (fileindex === fileTotal) {
+               if (fileindex === listeFiles.length) {
 
                   if (searchResult.length > 0) {
 
@@ -802,6 +809,10 @@ const openFiles = (allFiles, mode, searchOptions) => {
                      searchFail.classList.add('show')
                      body.classList.remove('wait')
                   }
+
+                  duration = performance.now() - startTime;
+                  console.log(`durée SEARCH : ${duration}ms`);
+
                }
             }
                break
@@ -815,12 +826,16 @@ const openFiles = (allFiles, mode, searchOptions) => {
 
                tableResultListeners()
                body.classList.remove('wait')
+
+               duration = performance.now() - startTime;
+               console.log(`durée PROCESS : ${duration}ms`);
             }
                break
 
          }
 
          fileindex++
+
 
       })
    }
@@ -830,6 +845,8 @@ const openFiles = (allFiles, mode, searchOptions) => {
 //    RECHERCHE DU TERME
 // ---------------------------------------------------------
 const searchInFile = (thisFileName, thisLog, searchOptions) => {
+
+   //console.log(thisFileName)
 
    let stringToFind = searchOptions.termTosearch
    let index = 0
@@ -854,6 +871,8 @@ const searchInFile = (thisFileName, thisLog, searchOptions) => {
    // CombatLog
    if (resultSearchLang !== undefined) {
 
+      let index = 0
+
       resultSearchLang.lines.forEach(line => {
 
          line[4] = line[4].replace(/(<span class="highlight">.*?<\/span>)/g, "$&")
@@ -869,6 +888,8 @@ const searchInFile = (thisFileName, thisLog, searchOptions) => {
 
          if (founded)
             line[4] = line[4].replace(regEx, '<span class="highlight">$&</span>')
+
+         index++
 
       })
 
