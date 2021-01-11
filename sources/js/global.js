@@ -704,7 +704,9 @@ const openFiles = (allFiles, mode, searchOptions) => {
 
    body.classList.add('wait')
    const startTime = performance.now()
-   let duration
+   let durationSearch = 0
+   let durationLang = 0
+   let durationProcess = 0
 
    // console.warn(listeFiles.length)
 
@@ -715,7 +717,15 @@ const openFiles = (allFiles, mode, searchOptions) => {
          let fileReader = new FileReader()
          fileReader.onload = () => resolve(fileReader.result)
          //onloadend ?
-         fileReader.readAsText(thisFile, 'CP1251')
+         // fileReader.readAsText(thisFile, 'CP1251')
+         fileReader.onprogress = function(data) {
+            if (data.lengthComputable) {
+               let progress =  (data.loaded / data.total) * 100
+               document.querySelector('#blocWait .progress').style.width = `${progress}%`
+               //console.warn(progress);
+            }
+         }
+         fileReader.readAsText(thisFile, 'ISO-8859-1')
       })
 
       Promise.all([filePromise]).then(fileContents => {
@@ -751,6 +761,9 @@ const openFiles = (allFiles, mode, searchOptions) => {
                   document.querySelector('#statsInfo .icon').classList.add('close')
 
                }
+
+              // durationLang = performance.now() - startTime;
+              // console.log(`durée Lang : ${durationLang}ms`);
 
             }
                break
@@ -810,8 +823,8 @@ const openFiles = (allFiles, mode, searchOptions) => {
                      body.classList.remove('wait')
                   }
 
-                  duration = performance.now() - startTime;
-                  console.log(`durée SEARCH : ${duration}ms`);
+                 // durationSearch = performance.now() - startTime;
+                 // console.log(`durée SEARCH : ${durationSearch}ms`);
 
                }
             }
@@ -827,19 +840,18 @@ const openFiles = (allFiles, mode, searchOptions) => {
                tableResultListeners()
                body.classList.remove('wait')
 
-               duration = performance.now() - startTime;
-               console.log(`durée PROCESS : ${duration}ms`);
+              // durationProcess = performance.now() - startTime;
+             //  console.log(`durée PROCESS : ${durationProcess}ms`);
+             //  console.log(`durée TOTALE : ${durationProcess + durationSearch}ms`);
             }
                break
 
          }
-
          fileindex++
-
-
       })
    }
-
+   // duration = performance.now() - startTime;
+   // console.log(`durée TOTALE : ${duration}ms`);
 }
 // ---------------------------------------------------------
 //    RECHERCHE DU TERME
