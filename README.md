@@ -16,7 +16,8 @@ __13/01/2021__
 - Amélioration de la copie :<br/>
 Ctrl+C -> Copie l'intégralité du log ouvert.<br/>
 Sélection + Ctrl+C -> Copie une portion du log ouvert.<br/>
-(dans les deux cas, les colonnes [pseudo] et [type de message] ne sont copiés que si les colonnes sont visibles.
+
+Dans les deux cas, les colonnes [pseudo] et [type de message] ne sont copiées que si les colonnes sont visibles.
 
 __11/01/2021__
 - Ajout d'une petite barre de progression.
