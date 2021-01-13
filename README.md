@@ -13,9 +13,9 @@ Mise en forme des logs nwn2 générés par le ClientExtension
 -> Pour quitter le mode recherche et revenir à la liste des fichiers, cliquer sur le gros bouton orange en haut à gauche.  
 
 __13/01/2021__
-- Amélioration de la copie :
-Ctrl+C -> Copie l'intégralité du log ouvert.
-Sélection + Ctrl+C -> Copie une portion du log ouvert.
+- Amélioration de la copie :<br/>
+Ctrl+C -> Copie l'intégralité du log ouvert.<br/>
+Sélection + Ctrl+C -> Copie une portion du log ouvert.<br/>
 (dans les deux cas, les colonnes [pseudo] et [type de message] ne sont copiés que si les colonnes sont visibles.
 
 __11/01/2021__
