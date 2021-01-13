@@ -1,7 +1,6 @@
 const domLoaded = function () {
 
    // Détection de la langue
-
    let navigatorLangFR = /^fr\b/.test(navigator.language)
    const domToTranslate = document.querySelectorAll("[data-fr]")
 
@@ -41,6 +40,8 @@ const domLoaded = function () {
 
    setStaticsEvents(document.getElementById('listing'))
    resizeResult()
+
+   manageCopy()
 
 }
 
@@ -718,9 +719,9 @@ const openFiles = (allFiles, mode, searchOptions) => {
          fileReader.onload = () => resolve(fileReader.result)
          //onloadend ?
          // fileReader.readAsText(thisFile, 'CP1251')
-         fileReader.onprogress = function(data) {
+         fileReader.onprogress = function (data) {
             if (data.lengthComputable) {
-               let progress =  (data.loaded / data.total) * 100
+               let progress = (data.loaded / data.total) * 100
                document.querySelector('#blocWait .progress').style.width = `${progress}%`
                //console.warn(progress);
             }
@@ -729,7 +730,7 @@ const openFiles = (allFiles, mode, searchOptions) => {
       })
 
       Promise.all([filePromise]).then(fileContents => {
-      // Promise.resolve([filePromise]).then(fileContents => {
+         // Promise.resolve([filePromise]).then(fileContents => {
 
          let matchLineSearch, thisLogFormatted, result
 
@@ -762,8 +763,8 @@ const openFiles = (allFiles, mode, searchOptions) => {
 
                }
 
-              // durationLang = performance.now() - startTime;
-              // console.log(`durée Lang : ${durationLang}ms`);
+               // durationLang = performance.now() - startTime;
+               // console.log(`durée Lang : ${durationLang}ms`);
 
             }
                break
@@ -823,8 +824,8 @@ const openFiles = (allFiles, mode, searchOptions) => {
                      body.classList.remove('wait')
                   }
 
-                 // durationSearch = performance.now() - startTime;
-                 // console.log(`durée SEARCH : ${durationSearch}ms`);
+                  // durationSearch = performance.now() - startTime;
+                  // console.log(`durée SEARCH : ${durationSearch}ms`);
 
                }
             }
@@ -840,9 +841,9 @@ const openFiles = (allFiles, mode, searchOptions) => {
                tableResultListeners()
                body.classList.remove('wait')
 
-              // durationProcess = performance.now() - startTime;
-             //  console.log(`durée PROCESS : ${durationProcess}ms`);
-             //  console.log(`durée TOTALE : ${durationProcess + durationSearch}ms`);
+               // durationProcess = performance.now() - startTime;
+               //  console.log(`durée PROCESS : ${durationProcess}ms`);
+               //  console.log(`durée TOTALE : ${durationProcess + durationSearch}ms`);
             }
                break
 
@@ -1322,6 +1323,104 @@ const lineColorByName = (unLog, filename) => {
    return tblPjName
 
 }
+
+const manageCopy = () => {
+
+   document.body.addEventListener("copy", function (e) {
+
+          e.preventDefault()
+
+          const copyText = document.querySelector("#fileContent")
+          let range = document.getSelection()
+          let textToCopy = ''
+
+
+          if (range.isCollapsed) {
+
+             textToCopy = copyText.outerHTML
+             textToCopy = textToCopy.split('</tr>')
+
+          } else {
+
+             range = range.getRangeAt(0)
+
+             if (range.commonAncestorContainer.closest('#fileContent') !== null) {
+
+                let allnodes = [...range.commonAncestorContainer.childNodes]
+                let startSelection = range.startContainer.parentNode
+                let endSelection = range.endContainer.parentNode
+                let selectedNodes = []
+
+                startSelection = startSelection.closest('tr')
+                endSelection = endSelection.closest('tr')
+
+                let startIndex = allnodes.indexOf(startSelection)
+                let endIndex = allnodes.indexOf(endSelection)
+
+                // selectedNodes = allnodes.slice(startIndex, endIndex + 1)
+
+                for (let i in allnodes) {
+                   let thisNode = allnodes[i]
+                   if (i >= startIndex && i <= endIndex) {
+                      selectedNodes.push(thisNode.innerHTML)
+                   }
+                }
+
+                textToCopy = selectedNodes
+             }
+
+          }
+
+          if (textToCopy !== '') {
+
+             for (let i in textToCopy) {
+
+                textToCopy[i] = textToCopy[i].replaceAll(/(\r\n|\n|\r)/gm, '')
+
+                let arrayTemp = textToCopy[i].split('</td>')
+                    .filter(lineHide => !lineHide.match(/<td class=".*?hide"[^>]*>/gm))
+                    .filter(lineIndex => !lineIndex.match(/<td class="index"[^>]*>.*?[^<]+/gm))
+
+                for (let y in arrayTemp) {
+                   arrayTemp[y] = arrayTemp[y].replaceAll(/<td class="message[^>]*>/gm, ': ')
+                       .replaceAll(/<strong>/gm, '(')
+                       .replaceAll(/<\/strong>/gm, ')')
+                       .replaceAll(/<[^>]*>/gm, '')
+                       .trim()
+                }
+
+                textToCopy[i] = arrayTemp.join(' ') + '\r\n'
+             }
+
+             textToCopy = textToCopy.join('').trim()
+
+             //e.clipboardData.setData("text/uri-list", copyText.outerHTML)
+
+             navigator.clipboard.writeText(textToCopy).then(
+                 function () {
+                    console.log("copie ok")
+                 })
+                 .catch(
+                     function () {
+                        alert("Erreur à la copie"); // error
+                     })
+
+          }
+
+          // textArea.textContent = e.clipboardData.getData("text/uri-list")
+          // textArea.value = e.clipboardData.getData("text/uri-list")
+
+          //textArea.click();
+
+          // console.log(e.clipboardData.getData("text/uri-list"))
+
+
+       }
+   )
+
+
+}
+
 
 // Attend que la page soit TOTALEMENT chargée
 if (document.readyState === "complete" || (document.readyState !== "loading" && !document.documentElement.doScroll)) {
