@@ -5,11 +5,11 @@ Mise en forme des logs nwn2 générés par le ClientExtension
 ![read_log_nwn](https://zupimages.net/up/20/48/zcer.jpg)
 
 
-1/ Récupérer __tous__ les fichiers et les placer dans un dossier (peu importe où).  
-2/ Ouvrir le fichier __read_log.html__ dans le navigateur.  
-3/ Sélectionner un dossier __log/pj__ via le bouton bleu en haut à gauche et valider  
+__1/__ Récupérer __tous__ les fichiers et les placer dans un dossier (peu importe où).  
+__2/__ Ouvrir le fichier __read_log.html__ dans le navigateur.  
+__3/__ Sélectionner un dossier __log/pj__ via le bouton bleu en haut à gauche et valider  
 (sous windows ils sont dans le dossier __[Documents › NevewinterNights2 › log › pj]__)  
-4/ Pour lancer une recherche, clique sur le bouton orange avec une loupe.  
+__4/__ Pour lancer une recherche, clique sur le bouton orange avec une loupe.  
 -> Pour quitter le mode recherche et revenir à la liste des fichiers, cliquer sur le gros bouton orange en haut à gauche.  
 
 __13/01/2021__
