@@ -1484,3 +1484,13 @@ td {
    left: 300px;
    top: 200px;
 }
+
+
+#pastTexte {
+   position: absolute;
+   top: 100px;
+   left: 100px;
+   width: 400px;
+   height: 200px;
+   z-index: 100000;
+}

@@ -1325,6 +1325,44 @@ const lineColorByName = (unLog, filename) => {
 }
 
 const manageCopy = () => {
+   /*
+      document.body.addEventListener("paste", function (e) {
+
+         e.preventDefault()
+
+         let clipboardData = e.clipboardData || window.clipboardData
+         let pastedData = clipboardData.getData('Text')
+
+         pastedData = pastedData.split(/\n\r|\n/g)
+         const regExLine =/^(\[(?:\d|[01]\d|2[0-3]):[0-5]\d\])\s((?:[\[]|[\(]).*?(?:[\]]|[\)]))?(.*?)(\[.*?\])?.:.(.*?$)/gm
+         let matchReg = [{}]
+
+         console.log(pastedData)
+
+         pastedData.forEach(thisLine => {
+            let match = regExLine.exec(thisLine)
+            console.log(match)
+            if (match !== null) {
+               matchReg.push({
+                  heure: match[1],
+                  pseudo: match[2],
+                  pjName: match[3],
+                  dialogType: match[4],
+                  message: match[5],
+               })
+            }
+            // console.log(match)
+         })
+         console.log('matchReg : ', matchReg)
+
+
+         // let match = regExLine.exec(pastedData)
+         // console.log(pastedData)
+
+
+
+      })
+      */
 
    document.body.addEventListener("copy", function (e) {
 
@@ -1343,10 +1381,13 @@ const manageCopy = () => {
           } else {
 
              range = range.getRangeAt(0)
+             let ancestor = range.commonAncestorContainer
+             ancestor = ancestor.closest('#fileContent')
 
-             if (range.commonAncestorContainer.closest('#fileContent') !== null) {
+             if (ancestor !== null) {
 
-                let allnodes = [...range.commonAncestorContainer.childNodes]
+                let allnodes = [...ancestor.querySelector('tbody').childNodes]
+
                 let startSelection = range.startContainer.parentNode
                 let endSelection = range.endContainer.parentNode
                 let selectedNodes = []
@@ -1357,7 +1398,7 @@ const manageCopy = () => {
                 let startIndex = allnodes.indexOf(startSelection)
                 let endIndex = allnodes.indexOf(endSelection)
 
-                // selectedNodes = allnodes.slice(startIndex, endIndex + 1)
+                // let test = allnodes.slice(startIndex, endIndex + 1)
 
                 for (let i in allnodes) {
                    let thisNode = allnodes[i]
