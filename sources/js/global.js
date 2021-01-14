@@ -1381,7 +1381,7 @@ const manageCopy = () => {
           } else {
 
              range = range.getRangeAt(0)
-             let ancestor = range.commonAncestorContainer
+             let ancestor = range.commonAncestorContainer.parentNode
              ancestor = ancestor.closest('#fileContent')
 
              if (ancestor !== null) {
